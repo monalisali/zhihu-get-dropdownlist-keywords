@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.List;
 
 public class Crawler {
     private static final String _apiPrefix = "https://www.zhihu.com/api/v4/search/suggest?q=";
@@ -23,6 +24,11 @@ public class Crawler {
         //HttpGet httpGet = new HttpGet("https://www.zhihu.com/api/v4/search/suggest?q=%E4%BF%9D%E6%B8%A9%E9%A5%AD%E7%9B%92");
         HttpGet httpGet = new HttpGet(_apiPrefix + searchParam);
         CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+
+        //测试
+        Search search = new Search("保温饭盒");
+        search.getDropDownListKeys();
+        //测试
         try{
             System.out.println(httpResponse.getStatusLine());
             HttpEntity entity1 = httpResponse.getEntity();
