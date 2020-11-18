@@ -6,11 +6,24 @@
 
 
 
-    <select id="selectTopCategoryID" parameterType="String" resultType="TopCategory">
+    <select id="selectTopCategoryByName" parameterType="String" resultType="TopCategory">
         select id,name,isActive
         from dbo.[TopCategory]
-        where id = #{id}
+        where name = #{name}
     </select>
+
+    <insert id="insertTopCategory" parameterType="TopCategory">
+         insert into TopCategory (id,name,isActive)
+         values (#{id},#{name},#{isActive})
+    </insert>
+
+    <insert id="insertHotWords" parameterType="map">
+        insert into HotWord(id,topCategoryID,name)
+        values
+        <foreach item="h" collection="hotwords" separator=",">
+            (#{h.id},#{h.topCategoryID},#{h.name})
+        </foreach>
+    </insert>
 
     <select id="selectAllHotWord" resultMap="HotWordResultMap">
         select id,topCategoryID,name

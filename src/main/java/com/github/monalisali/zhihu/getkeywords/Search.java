@@ -3,6 +3,10 @@ package com.github.monalisali.zhihu.getkeywords;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.monalisali.dao.Dao;
+import com.github.monalisali.entity.HotWord;
+import com.github.monalisali.entity.TopCategory;
+import com.github.monalisali.utils.DatabaseHelp;
 import com.github.monalisali.utils.QueryDto;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -22,10 +26,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Search {
     private static final String _apiPrefix = "https://www.zhihu.com/api/v4/search/suggest?q=";
-
+    private static Dao dao = new Dao(DatabaseHelp.getSqlSessionFactory());
     public Search(String param) {
         searchParam = param;
         parameterAtoZ = addAtoZ();
@@ -49,15 +54,33 @@ public class Search {
         return parameterAtoZ;
     }
 
-    public List<String> getDropDownListHotwords() {
-        List<String> hotWords = new ArrayList<String>();
-        for (String key : parameterAtoZ
-        ) {
-            CloseableHttpResponse response = sendHttpGet(_apiPrefix, key);
-            List<String> crtHotwords = parseHtml(response);
-            hotWords.addAll(crtHotwords);
+    public void getDropDownListHotwords() {
+        TopCategory getTopCategory = dao.selectTopCategoryByName(this.getSearchParam().trim());
+        System.out.println("关键词参数:" + this.getSearchParam());
+        if(getTopCategory != null){
+            System.out.println("关键字已经存在，不会再获取热词！请到数据库和hotWords.txt中查找热词");
+            return;
+        }else
+        {
+            TopCategory topCategory = new TopCategory();
+            topCategory.setId(UUID.randomUUID().toString());
+            topCategory.setName(this.getSearchParam());
+            topCategory.setActive(true);
+            TopCategory insertTopCategory = dao.insertTopCategory(topCategory);
+            List<String> hotwords = getHotwordsFromZhihuDropdown();
+            List<HotWord> hotWordList = createHowwordList(insertTopCategory,hotwords);
+            dao.batchInsertUsers(hotWordList);
+            WriteFile writeFile = new WriteFile(this.getSearchParam());
+            try {
+                writeFile.writeHotWordsToFile(hotwords);
+                System.out.println("结果：");
+                hotwords.forEach(System.out::println);
+                System.out.println("结果已插入数据库，已写入hotWords.txt");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        return hotWords;
+
     }
 
     private List<String> addAtoZ() {
@@ -105,6 +128,30 @@ public class Search {
             e.printStackTrace();
         }
         return keys;
+    }
+
+    private List<String> getHotwordsFromZhihuDropdown(){
+        List<String> hotWords = new ArrayList<String>();
+        for (String key : parameterAtoZ
+        ) {
+            CloseableHttpResponse response = sendHttpGet(_apiPrefix, key);
+            List<String> crtHotwords = parseHtml(response);
+            hotWords.addAll(crtHotwords);
+        }
+        return hotWords;
+    }
+
+    private List<HotWord> createHowwordList(TopCategory top, List<String> hotNames){
+        List<HotWord> result = new ArrayList<>();
+        for (String h:hotNames
+             ) {
+            HotWord hotWord = new HotWord();
+            hotWord.setId(UUID.randomUUID().toString());
+            hotWord.setTopCategoryID(top.getId());
+            hotWord.setName(h);
+            result.add(hotWord);
+        }
+        return result;
     }
 
 }

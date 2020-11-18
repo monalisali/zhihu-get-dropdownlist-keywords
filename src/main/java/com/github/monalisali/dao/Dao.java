@@ -16,11 +16,33 @@ public class Dao {
         this.sqlSessionFactory = sqlSessionFactory;
     }
 
-    public TopCategory selectTopCategoryID(String id) {
-        try (SqlSession session = sqlSessionFactory.openSession()) {
+    public TopCategory selectTopCategoryByName(String name) {
+        try(SqlSession session = sqlSessionFactory.openSession()) {
             Map<String, Object> map = new HashMap<>();
-            map.put("id", id);
-            return session.selectOne("com.hcsp.Mapper.selectTopCategoryID", map);
+            map.put("name", name);
+            return session.selectOne("com.hcsp.Mapper.selectTopCategoryByName", map);
+        }
+    }
+
+    public TopCategory insertTopCategory(TopCategory topCategory){
+        try (SqlSession session = sqlSessionFactory.openSession()){
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", topCategory.getId());
+            map.put("name",topCategory.getName());
+            map.put("isActive",topCategory.isActive());
+            session.insert("com.hcsp.Mapper.insertTopCategory",map);
+            session.commit();
+        }
+
+        return topCategory;
+    }
+
+    public void batchInsertUsers(List<HotWord> hotwords){
+        try (SqlSession session = sqlSessionFactory.openSession(true)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("hotwords", hotwords);
+            session.insert("com.hcsp.Mapper.insertHotWords", map);
+            session.commit();
         }
     }
 
