@@ -18,15 +18,15 @@
     </insert>
 
     <insert id="insertHotWords" parameterType="map">
-        insert into HotWord(id,topCategoryID,name)
+        insert into HotWord(id,topCategoryID,name,isDoneBaidu,isDoneZhihu)
         values
         <foreach item="h" collection="hotwords" separator=",">
-            (#{h.id},#{h.topCategoryID},#{h.name})
+            (#{h.id},#{h.topCategoryID},#{h.name},#{h.isDoneBaidu},#{h.isDoneZhihu})
         </foreach>
     </insert>
 
     <select id="selectAllHotWord" resultMap="HotWordResultMap">
-        select id,topCategoryID,name
+        select id,topCategoryID,name,isDoneBaidu,isDoneZhihu
         from dbo.[HotWord]
 
     </select>

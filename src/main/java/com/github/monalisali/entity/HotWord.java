@@ -6,6 +6,8 @@ public class HotWord {
     private String id;
     private String topCategoryID;
     private String Name;
+    private boolean isDoneBaidu;
+    private boolean isDoneZhihu;
 
     public String getId() {
         return id;
@@ -29,5 +31,21 @@ public class HotWord {
 
     public void setName(String name) {
         Name = name;
+    }
+
+    public boolean isDoneBaidu() {
+        return isDoneBaidu;
+    }
+
+    public void setDoneBaidu(boolean doneBaidu) {
+        isDoneBaidu = doneBaidu;
+    }
+
+    public boolean isDoneZhihu() {
+        return isDoneZhihu;
+    }
+
+    public void setDoneZhihu(boolean doneZhihu) {
+        isDoneZhihu = doneZhihu;
     }
 }

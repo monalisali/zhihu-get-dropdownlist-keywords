@@ -7,8 +7,10 @@ import com.github.monalisali.dao.Dao;
 import com.github.monalisali.entity.HotWord;
 import com.github.monalisali.entity.TopCategory;
 import com.github.monalisali.utils.DatabaseHelp;
+import com.github.monalisali.utils.FileHelper;
 import com.github.monalisali.utils.QueryDto;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -68,7 +70,8 @@ public class Search {
             topCategory.setActive(true);
             TopCategory insertTopCategory = dao.insertTopCategory(topCategory);
             List<String> hotwords = getHotwordsFromZhihuDropdown();
-            List<HotWord> hotWordList = createHowwordList(insertTopCategory,hotwords);
+            hotwords.addAll(FileHelper.readBiaduManageHotWords());
+            List<HotWord> hotWordList = createHotwordList(insertTopCategory,hotwords);
             dao.batchInsertUsers(hotWordList);
             WriteFile writeFile = new WriteFile(this.getSearchParam());
             try {
@@ -141,7 +144,7 @@ public class Search {
         return hotWords;
     }
 
-    private List<HotWord> createHowwordList(TopCategory top, List<String> hotNames){
+    private List<HotWord> createHotwordList(TopCategory top, List<String> hotNames){
         List<HotWord> result = new ArrayList<>();
         for (String h:hotNames
              ) {
@@ -149,9 +152,10 @@ public class Search {
             hotWord.setId(UUID.randomUUID().toString());
             hotWord.setTopCategoryID(top.getId());
             hotWord.setName(h);
+            hotWord.setDoneBaidu(false);
+            hotWord.setDoneZhihu(false);
             result.add(hotWord);
         }
         return result;
     }
-
 }
