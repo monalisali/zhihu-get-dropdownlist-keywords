@@ -1,14 +1,8 @@
 package com.github.monalisali.zhihu.getkeywords;
 
 import com.github.monalisali.dao.Dao;
-import com.github.monalisali.entity.HotWord;
-import com.github.monalisali.entity.TopCategory;
-import com.github.monalisali.utils.DatabaseHelp;
-
 import java.io.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class Crawler {
     private static Dao dao;
