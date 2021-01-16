@@ -29,6 +29,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Search {
     private static final String _apiPrefix = "https://www.zhihu.com/api/v4/search/suggest?q=";
@@ -70,7 +71,10 @@ public class Search {
             topCategory.setActive(true);
             TopCategory insertTopCategory = dao.insertTopCategory(topCategory);
             List<String> hotwords = getHotwordsFromZhihuDropdown();
+            //把手动补录在baiduKeywordsManage.txt中的热词添加尽量
             hotwords.addAll(FileHelper.readBiaduManageHotWords());
+            //去重一下
+            hotwords = hotwords.stream().distinct().collect(Collectors.toList());
             List<HotWord> hotWordList = createHotwordList(insertTopCategory,hotwords);
             dao.batchInsertUsers(hotWordList);
             WriteFile writeFile = new WriteFile(this.getSearchParam());
