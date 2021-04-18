@@ -37,6 +37,7 @@ public class Search {
     public Search(String param) {
         searchParam = param;
         parameterAtoZ = addAtoZ();
+        parameterAtoZ.addAll(addAtoZPrefix());
     }
 
     private String searchParam;
@@ -95,6 +96,17 @@ public class Search {
         for (int i = 97; i <= 122; i++) {
             char c = (char) i;
             String key = searchParam + c;
+            keys.add(key);
+        }
+        return keys;
+    }
+
+    public List<String> addAtoZPrefix()
+    {
+        List<String> keys = new ArrayList<String>();
+        for (int i = 97; i <= 122; i++) {
+            char c = (char) i;
+            String key = c+ searchParam;
             keys.add(key);
         }
         return keys;
